@@ -37,6 +37,23 @@ app.get("/api/persons", (request, response) => {
 app.post("/api/persons", (request, response) => {
   const body = request.body;
 
+  if (!body.name) {
+    return response.status(400).json({ error: "name missing" });
+  }
+
+  if (!body.number) {
+    return response.status(400).json({ error: "number missing" });
+  }
+
+  const existingPerson = persons.find((person) => {
+    return person.name === body.name;
+  });
+
+  if (existingPerson) {
+    // decided on status code 409 based on this stackoverflow post: https://stackoverflow.com/questions/3825990/http-response-code-for-post-when-resource-already-exists
+    return response.status(409).json({ error: "name must be unique" });
+  }
+
   const person = {
     id: generateId(),
     name: body.name,
