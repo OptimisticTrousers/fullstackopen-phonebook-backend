@@ -26,8 +26,26 @@ let persons = [
   },
 ];
 
+const generateId = () => {
+  return Math.floor(Math.random() * 10000);
+};
+
 app.get("/api/persons", (request, response) => {
   response.json(persons);
+});
+
+app.post("/api/persons", (request, response) => {
+  const body = request.body;
+
+  const person = {
+    id: generateId(),
+    name: body.name,
+    number: body.number,
+  };
+
+  persons = persons.concat(person);
+
+  response.json(person);
 });
 
 app.get("/api/persons/:id", (request, response) => {
