@@ -30,10 +30,6 @@ let persons = [
   },
 ];
 
-const generateId = () => {
-  return Math.floor(Math.random() * 10000);
-};
-
 morgan.token("body", function (req, res) {
   return JSON.stringify(req.body);
 });
@@ -62,24 +58,14 @@ app.post("/api/persons", (request, response) => {
     return response.status(400).json({ error: "number missing" });
   }
 
-  const existingPerson = persons.find((person) => {
-    return person.name === body.name;
-  });
-
-  if (existingPerson) {
-    // decided on status code 409 based on this stackoverflow post: https://stackoverflow.com/questions/3825990/http-response-code-for-post-when-resource-already-exists
-    return response.status(409).json({ error: "name must be unique" });
-  }
-
-  const person = {
-    id: generateId(),
+  const person = new Person({
     name: body.name,
     number: body.number,
-  };
+  });
 
-  persons = persons.concat(person);
-
-  response.json(person);
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
 
 app.get("/api/persons/:id", (request, response) => {
